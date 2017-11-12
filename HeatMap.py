@@ -2,7 +2,7 @@ import heatmap
 import random
 from PIL import Image
 
-class HeatMap:
+class HeatMap: 
 	# dotsize - size of each dot on the map
 	def __init__(self, imageHeight=1024, imageWidth=1024, dotsize=150):
 		self.hm = heatmap.Heatmap()
@@ -10,9 +10,14 @@ class HeatMap:
 		self.imageWidth = imageWidth
 		self.dotsize = dotsize
 
-	def generateHeatMap(self, crowdPoints, imageName="sampleHeatMap.png"):
-		img = self.hm.heatmap(crowdPoints, dotsize=self.dotsize, opacity=128, size=(self.imageWidth, self.imageHeight), scheme='classic', area=None)
-		img.save(imageName)
+	def generateHeatMap(self, crowdPoints):
+		img = self.hm.heatmap(crowdPoints, dotsize=self.dotsize, opacity=255, size=(self.imageWidth, self.imageHeight), scheme='classic', area=None)
+		return img
+
+	def generateHeatMapImage(self, crowdPoints, imageName="sampleHeatMap"):
+		img = self.generateHeatMap(crowdPoints)
+		img.save(imageName+'.png')
+		return img
 
 
 if __name__ == "__main__":    

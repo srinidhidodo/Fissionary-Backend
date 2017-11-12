@@ -5,12 +5,13 @@ from HeatMap import HeatMap
 class CrowdSimulator:
 	# height and width of the place (same as that of image captured by cameras)
 	# changerate - rate at which ppl move out of the place
-	def __init__(self, sizeX=1024, sizeY=1024, changeRate=10):
+	def __init__(self, heatmap, sizeX=1024, sizeY=1024, changeRate=10):
 		self.sizeX = sizeX
 		self.sizeY = sizeY
 		self.changeRate = changeRate
-		self.crowd = []
-		self.initializeCrowd()
+		self.heatmap = heatmap
+		self.imageNum = 1
+		self.generateCrowd()
 
 	def getCellProbability(self, x, y):
 		weight = 1
@@ -30,22 +31,42 @@ class CrowdSimulator:
 		return probability
 
 	# assume entrance is at the top
-	def initializeCrowd(self):
+	def generateCrowd(self, threshold=0.5):
+		self.crowd = []
 		for x in range(self.sizeX):
 			for y in range(self.sizeY):
 				probability = self.getCellProbability(x,y)
-				if probability > 0.5:
+				if probability > threshold:
 					self.crowd.append((x,y))
 
-	def getNextCrowdSimulation(self):
-		pass
+	def getCrowdSimulator(self, saveImage=False, imageName="sampleHeatMap"):
+		while True:
+			if saveImage:
+				img = self.heatmap.generateHeatMapImage(self.crowd, imageName)
+			else:
+				img = self.heatmap.generateHeatMap(self.crowd)
+			yield img
+			self.imageNum += 1
+			threshold = random.uniform(0.4, 0.6)
+			self.generateCrowd(threshold)
 
-	def generateHeatMap(self, heatmap, imageName):
-		heatmap.generateHeatMap(self.crowd, imageName)
 
 
 if __name__ == "__main__":    
-	crowd = CrowdSimulator(100,100)
-	#print crowd.getNextCrowdSimulation()
 	heatmap = HeatMap()
-	crowd.generateHeatMap(heatmap, 'sample.png')
+	crowd = CrowdSimulator(heatmap, 100,100)
+	simulator = crowd.getCrowdSimulator(True)
+	for i in range(1):
+		simulator.next()
+		
+	
+	'''
+	heatmap = HeatMap()
+	crowd = CrowdSimulator(heatmap, 100,100)
+	#print crowd.getNextCrowdSimulation()
+	hmap = crowd.generateHeatMap(heatmap)
+	print hmap
+	'''
+
+
+
