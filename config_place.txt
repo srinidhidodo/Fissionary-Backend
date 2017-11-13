@@ -1,0 +1,3 @@
+001;wonderla;12.8346;77.4010
+002;pes university;12.9345;77.5345
+003;visvesvaraya museum;12.9752;77.5963
