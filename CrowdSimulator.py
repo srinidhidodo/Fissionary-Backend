@@ -1,14 +1,16 @@
 import random
+import threading
 from HeatMap import HeatMap
 
+# crowd updated every minute
 # simulate crowd by generating coordinates representing people
+# used to generate a heat map
 class CrowdSimulator:
 	# height and width of the place (same as that of image captured by cameras)
 	# changerate - rate at which ppl move out of the place
-	def __init__(self, heatmap, sizeX=1024, sizeY=1024, changeRate=10):
+	def __init__(self, heatmap, sizeX=1024, sizeY=1024):
 		self.sizeX = sizeX
 		self.sizeY = sizeY
-		self.changeRate = changeRate
 		self.heatmap = heatmap
 		self.imageNum = 1
 		self.generateCrowd()
@@ -50,23 +52,28 @@ class CrowdSimulator:
 			threshold = random.uniform(0.4, 0.6)
 			self.generateCrowd(threshold)
 
+	# start simulation by generating new crowd using the simulator every 1 min
+	# spawns a new thread to achieve this
+	@staticmethod
+	def startSimulation(simulator=None):
+		def generateNewCrowd(simulator):
+			threading.Timer(60.0, lambda: generateNewCrowd(simulator)).start()
+			simulator.next()
+
+		if not simulator:
+			heatmap = HeatMap()
+			crowd = CrowdSimulator(heatmap, 100,100)
+			simulator = crowd.getCrowdSimulator(True)
+		generateNewCrowd(simulator)
 
 
+# image name => l<location id>p<place id>
+# create one simulator for each place
+# start simulation for each simulator
 if __name__ == "__main__":    
 	heatmap = HeatMap()
 	crowd = CrowdSimulator(heatmap, 100,100)
-	simulator = crowd.getCrowdSimulator(True)
-	for i in range(1):
-		simulator.next()
-		
-	
-	'''
-	heatmap = HeatMap()
-	crowd = CrowdSimulator(heatmap, 100,100)
-	#print crowd.getNextCrowdSimulation()
-	hmap = crowd.generateHeatMap(heatmap)
-	print hmap
-	'''
-
+	simulator = crowd.getCrowdSimulator(saveImage=True, imageName='lt1pt1')
+	CrowdSimulator.startSimulation(simulator)
 
 
