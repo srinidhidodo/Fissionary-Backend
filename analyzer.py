@@ -1,4 +1,6 @@
-# test data
+import database
+
+# test data - for testing purpose
 data = {
 	'locations': [
 		{
@@ -37,17 +39,34 @@ data = {
 }
 
 def getLocations():
-	locations = data['locations']
 	res = []
+	locations = database.getAllLocations()
 	for location in locations:
-		res.append({'locationId':location['locationId'], 'locationName':location['locationName']})
+		res.append({'locationId':int(location[0]), 'locationName':location[1]})
 	return res
 
 def getLocation(locationId):
-	locations = data['locations']
-	for location in locations:
-		if location['locationId'] == locationId:
-			return location
+	location = database.queryLocation(locationId)[0]
+	res = {'latitude':location[2], 'longitude':location[3], 'locationName':location[1], 'locationId':int(location[0])}
+	places = getPlaces_(locationId)
+	pl = []
+	for place in places:
+		density = getPlaceDensity_(locationId, place[0])
+		density = density[-1]
+		density = {'density': density[3], 'time': density[2]}
+		threshold = database.getThreshold(locationId, place[0])[0][2]
+		pl.append({'latitude':place[2], 'longitude':place[3], 'placeId':int(place[0]), 'placeName':place[1], 'threshold':threshold, 'placeDensity': density})
+	res['places'] = pl
+	return res
+
+def getPlaces_(locationId):
+	return database.getPlaces(locationId)
+
+def getPlace_(locationId, placeId):
+	return database.getPlace(locationId,placeId)
+
+def getPlaceDensity_(locationId, placeId):
+	return database.getPlaceDensity(locationId, placeId)
 
 def getPlaces(locationId):
 	location = getLocation(locationId)
@@ -58,7 +77,7 @@ def getPlace(locationId, placeId):
 	location = getLocation(locationId)
 	places = location['places']
 	for place in places:
-		if place['placeId'] == placeId:
+		if int(place['placeId']) == int(placeId):
 			return place
 
 def getPlaceDensity(locationId, placeId):

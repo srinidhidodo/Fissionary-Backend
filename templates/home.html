@@ -1,0 +1,117 @@
+<html>
+<head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body class="parallax-bg" style="background-image:url({{ url_for('static', filename='images/img1.jpg') }})">
+	<div class="page-divs" style="background-color:black; text-align:center; color:white; font-size:40px" > Fissionary </div>
+	<div class="page-divs" style="background-color:black; height:80%; text-align:center; color:white; font-size:30px" >
+		<div>
+			Locations Near You
+		</div>
+		<p />
+		<div id="container" >
+			<div id="map" style="float:left; height:80%; width:49%; border:1px solid white"> Map </div>
+			<div id="listDiv" style="float:right; width:49%; "> 
+			List of Locations Near You <br />
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	document.body.onload = sendReq;
+		var sampleJSON;
+		//var sampleJSON = "{\"locations\":[{\"locationId\":1,\"locationName\":\"WonderLa\"},{\"locationId\":2,\"locationName\":\"Essel World\"}]}";		
+		function showLocationList()
+		{
+			if(xhr.readyState==4 && xhr.status==200)
+			{
+				sampleJSON = JSON.parse(xhr.responseText);
+				//console.log(sampleJSON);
+				//var sampleJSON = "{\"locations\":[{\"locationId\":1,\"locationName\":\"WoonderLa\"},{\"locationId\":2,\"locationName\":\"Essel World\"}]}";
+				var theList = sampleJSON;
+				console.log(theList);
+				
+				var listDiv = document.getElementById("listDiv");
+				
+				//MAP PART FROM VIDYA
+				
+				var listHtml = document.createElement("p");
+				for (var i=0; i<theList.locations.length; i++) //Check what is to be iterated with JSON; CHECK
+				{
+					li = document.createElement("p");
+					a = document.createElement("a");
+					li.appendChild(a);
+					a.innerHTML = theList.locations[i].locationName; //Check locationName with JSON; CHECK
+					a.href = "location/lid/"+theList.locations[i].locationId; //Check locationId with JSON; CHECK
+					listHtml.appendChild(li);
+				}
+				listDiv.appendChild(listHtml);
+			}
+			initMap();
+		}
+		//showLocationList();
+		
+		function sendReq()
+		{
+			xhr = new XMLHttpRequest();
+			xhr.open("GET","http://localhost:5000/locations",true);
+			//xhr.open("GET","test1.php",true);
+			xhr.onreadystatechange = showLocationList;
+			xhr.send();
+		}
+	
+      function initMap() {	
+	  console.log('too early?');
+					handle_geolocation_query(sampleJSON);
+		
+		}
+		function drawMap( add , map)
+		{
+			console.log("---");
+			console.log(add);
+			var address = add;
+			var _lat =0;
+			var _lng = 0;
+        	geocoder = new google.maps.Geocoder();
+        	geocoder.geocode(
+			{
+				'address': address
+			},
+			function(results, status) 
+			{                      
+				_lat = results[0].geometry.location.lat();
+				_lng = results[0].geometry.location.lng();				
+				var uluru = {lat: _lat, lng: _lng};
+				
+				var marker = new google.maps.Marker(
+				{
+					position: uluru,
+					map: map
+				});
+				
+			});
+		}
+	  function handle_geolocation_query(str_json)
+	  {
+		var uluru = {lat: 22.9734, lng: 78.6569};
+		var map = new google.maps.Map(document.getElementById('map'), {  zoom: 5, center:uluru     });
+		config_json = str_json;//JSON.parse(str_json)		
+		for (var key in config_json['locations']) 
+		{
+			if (config_json['locations'].hasOwnProperty(key)) 
+			{				
+				drawMap(config_json['locations'][key]['locationName'] , map);
+			}
+		}
+	 }
+	  
+	  
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-1PozKHxTwZPlZmj9ius6615N7ksfM_8&">
+    </script>
+</body>
+</html>

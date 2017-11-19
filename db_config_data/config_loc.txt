@@ -1,0 +1,3 @@
+1;wonderla;12.8346;77.4010
+2;pes university;12.9345;77.5345
+3;visvesvaraya museum;19.231434;72.8031325

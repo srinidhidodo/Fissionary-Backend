@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+
+	<head>
+		<script src="static/js/jquery-3.2.1.min.js"> </script>
+		<script type="text/javascript">
+
+			function initdb() {
+				$.ajax({
+				  url: "/admin/initdb",
+				});
+			}
+		</script>
+	</head>
+   <body>
+   
+      <h1>Admin Page</h1>
+
+      <button value="init db" onclick="initdb()" >Init Database </button>
+      
+   </body>
+</html>
