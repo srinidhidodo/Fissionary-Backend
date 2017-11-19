@@ -57,13 +57,13 @@ class CrowdSimulator:
 	@staticmethod
 	def startSimulation(simulator=None):
 		def generateNewCrowd(simulator):
-			threading.Timer(60.0, lambda: generateNewCrowd(simulator)).start()
+			threading.Timer(10.0, lambda: generateNewCrowd(simulator)).start()
 			simulator.next()
 
 		if not simulator:
 			heatmap = HeatMap()
 			crowd = CrowdSimulator(heatmap, 100,100)
-			simulator = crowd.getCrowdSimulator(True)
+			simulator = crowd.getCrowdSimulator(False)
 		generateNewCrowd(simulator)
 
 
@@ -73,7 +73,10 @@ class CrowdSimulator:
 if __name__ == "__main__":    
 	heatmap = HeatMap()
 	crowd = CrowdSimulator(heatmap, 100,100)
-	simulator = crowd.getCrowdSimulator(saveImage=True, imageName='lt1pt1')
+	simulator = crowd.getCrowdSimulator(saveImage=True, imageName='l1_p1')
+	CrowdSimulator.startSimulation(simulator)
+
+	simulator = crowd.getCrowdSimulator(saveImage=True, imageName='l2_p2')
 	CrowdSimulator.startSimulation(simulator)
 
 

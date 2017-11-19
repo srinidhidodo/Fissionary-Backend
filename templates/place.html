@@ -1,0 +1,118 @@
+<html>
+<head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body class="parallax-bg" style="background-image:url({{ url_for('static', filename='images/img1.jpg') }})">
+	<div class="page-divs" style="background-color:black; text-align:center; color:white; font-size:40px" > Fissionary </div>
+	<div class="page-divs" style="background-color:black; height:80%; text-align:center; color:white; font-size:30px" >
+		<div> </div>
+		<p />
+		<div id="container" >
+			<div id="mapDiv" style="float:left; height:80%; width:49%; border:1px solid white"> Map </div>
+			<div id="listDiv" style="float:right; width:49%; "> </div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		
+		function showPlaceDetails()
+		{
+			if(xhr1.readyState==4 && xhr1.status==200)
+			{
+				var sampleJSON = xhr1.responseText; 
+				//var sampleJSON = "{\"place\":{\"latitude\":\"34.22\",\"longitude\":\"40.22\",\"placeDensity\":{\"density\":10,\"time\":\"12:00\"},\"placeId\":1,\"placeName\":\"place1\",\"placeSize\":100,\"threshold\":50}}";
+				var theList = JSON.parse(sampleJSON);
+				console.log(theList);
+				
+				var listDiv = document.getElementById("listDiv");
+				
+				//MAP PART FROM THE JSON (HEATMAP)
+				var p1 = document.createElement("p");
+				var p2 = document.createElement("p");
+				var p3 = document.createElement("p");
+				p1.innerHTML="Place Name: "+theList.place.placeName;
+				p2.innerHTML="Density: "+theList.place.placeDensity.density;
+				p3.innerHTML="Threshold density: "+theList.place.threshold;
+				listDiv.appendChild(document.createElement("p"));
+				listDiv.appendChild(p1);
+				listDiv.appendChild(p2);
+				listDiv.appendChild(p3);
+			}
+		}
+		
+		// base 64 image - test
+		/*function showHeatMap(){
+			if (xhr2.readyState==4 && xhr2.status==200) {
+			    var uInt8Array = new Uint8Array(xhr2.response);
+			    var i = uInt8Array.length;
+			    var binaryString = new Array(i);
+			    while (i--)
+			    {
+			      binaryString[i] = String.fromCharCode(uInt8Array[i]);
+			    }
+			    var data = binaryString.join('');
+
+			    var base64 = window.btoa(data);
+
+			    //document.getElementById("myImage").src="data:image/png;base64,"+base64;
+			    var img = document.createElement("img");
+
+				img.src = "data:image/png;base64,"+base64;
+				img.alt = "download failed"
+				document.getElementById("mapDiv").appendChild(img);
+		  }
+		}*/
+
+		
+		function showHeatmap()
+		{
+			if (xhr2.readyState==4 && xhr2.status==200)
+			{
+				var img = document.createElement("img");
+
+				img.src = xhr2.response;
+				img.alt = "download failed"
+				document.getElementById("mapDiv").appendChild(img);
+			}
+		}
+
+		/*function showHeatmap(lid, pid)
+		{
+			var img = document.createElement("img");
+			img.src = "/locations/"+lid+"/places/"+pid;
+			document.getElementById("mapDiv").appendChild(img);
+		}*/
+		
+		function showPlace(lid,pid)
+		{
+			
+			xhr1 = new XMLHttpRequest();
+			xhr1.open("GET","/locations/"+lid+"/places/"+pid,true);
+			xhr1.onreadystatechange = showPlaceDetails;
+			xhr1.send(); 
+			
+			
+			xhr2 = new XMLHttpRequest();
+			xhr2.open("GET","/heatmap/location/"+lid+"/place/"+pid,true);
+			xhr2.onreadystatechange = showHeatmap;
+			xhr2.send(); 
+			
+			//showHeatmap(lid, pid)
+			
+			showPlaceDetails();
+		}
+		
+		//params = (new URL(document.location)).searchParams;
+		//locationId = params.get("lid");
+		//placeId = params.get("pid");
+		locationId = {{ locationId }}
+		placeId = {{ placeId }}
+		showPlace(locationId, placeId);
+		
+		
+	</script>
+</body>
+</html>

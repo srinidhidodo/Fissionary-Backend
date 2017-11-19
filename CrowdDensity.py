@@ -32,4 +32,3 @@ if __name__ == '__main__':
 	density = CrowdDensity.getPlaceDensity(1, 1)
 	print 'crowd density of place: %f' % (density)
 
-
