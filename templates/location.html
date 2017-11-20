@@ -1,0 +1,186 @@
+<html>
+<head>
+	<script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-1PozKHxTwZPlZmj9ius6615N7ksfM_8">
+    </script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body class="parallax-bg" style="background-image:url({{ url_for('static', filename='images/img1.jpg') }})">
+	<div class="page-divs" style="background-color:black; text-align:center; color:white; font-size:40px" > Fissionary </div>
+	<div class="page-divs" style="background-color:black; height:80%; text-align:center; color:white; font-size:30px" >
+		<div>
+			Places Near You
+		</div>
+		<p />
+		<div id="container" >
+			<div><img src="{{ url_for('static', filename='images/foo3.png') }}"> Least density       <img src="{{ url_for('static', filename='images/foo2.png') }}"> Moderately dense       <img src="{{ url_for('static', filename='images/foo1.png') }}">Very dense</div>
+			<div id="map" style="float:left; height:80%; width:49%; border:1px solid white"> Map </div>
+			<div id="listDiv" style="float:right; width:49%; "> 
+			Recommended Places to Visit (Ranked) <br />
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//var s = "{\"locations\":[{\"locationId\":1,\"locationName\":\"loc1\",\"places\":[{\"placeId\":1,\"placeName\":\"place1\",\"placeSize\":100,\"threshold\":50,\"placeDensity\":{\"time\":\"12:00\",\"density\":10}},{\"placeId\":2,\"placeName\":\"XDMax\",\"placeSize\":200,\"threshold\":10,\"placeDensity\":{\"time\":\"20:00\",\"density\":100}}]}]}";
+		//Or whatever JSON is received, XHR req sent per minute, and retrieved.
+		/*
+		*/
+		//var ps = JSON.parse(s);
+		//console.log(ps.locations[0].locationName);
+		// 12.834556,77.4001127,17z
+		//var sampleJSON = "{\"location\" : {\"latitude\" : \"12.834556\"  }"}"
+		var sampleJSON;
+		function drawmarker(uluru , map , iconname)
+		{
+			console.log("in marker :: "+ uluru + "::" + iconname);
+			var marker = new google.maps.Marker(
+						{
+							position: uluru,
+							map: map,
+							icon: iconname
+							
+						});
+		}
+		function Showmaps(sampleJSON)
+		{
+			//var sampleJSON = "{\"location\":{\"latitude\":\"12.835423\",\"locationId\":1,\"locationName\":\"wonderla\",\"longitude\":\"77.400913\",\"places\":[{\"latitude\":\"12.834682\",\"longitude\":\"77.399030\",\"placeDensity\":{\"density\":10,\"time\":\"12:00\"},\"placeId\":1,\"placeName\":\"dungeonride\",\"placeSize\":100,\"threshold\":50},{\"latitude\":\"12.8345612\",\"longitude\":\"77.3987833\",\"placeDensity\":{\"density\":290,\"time\":\"20:00\"},\"placeId\":2,\"placeName\":\"XDMax\",\"placeSize\":300,\"threshold\":100},{\"latitude\":\"12.834556\",\"longitude\":\"77.4001127\",\"placeDensity\":{\"density\":10,\"time\":\"12:00\"},\"placeId\":1,\"placeName\":\"dungeonride\",\"placeSize\":100,\"threshold\":50}]}}";
+			//console.log("in show maps11111");
+			var theList = JSON.parse(sampleJSON);
+				//console.log(theList);
+				var mainuluru = {lat: 12.835423, lng: 77.400913};
+		var map = new google.maps.Map(document.getElementById('map'), {  zoom: 17, center:mainuluru     });
+				var listDiv = document.getElementById("listDiv");
+				var listHtml = document.createElement("p");			
+				
+				for (var i=0; i<theList.location.places.length; i++)
+				{					
+					var ratio = theList.location.places[i].	placeDensity.density/theList.location.places[i].placeSize;
+					thresholdratio = theList.location.places[i].threshold/theList.location.places[i].placeSize;					
+					var uluru = {lat: parseFloat(theList.location.places[i].latitude), lng:parseFloat(theList.location.places[i].longitude)};					
+					if(ratio>thresholdratio)
+					{					
+						drawmarker(uluru , map , "{{ url_for('static', filename='images/foo3.png') }}");						
+				
+					}
+					
+					else if(0.9>ratio>thresholdratio)
+					{						
+						drawmarker(uluru , map , "{{ url_for('static', filename='images/foo2.png') }}");
+					}
+					else
+					{				
+						drawmarker(uluru , map , "{{ url_for('static', filename='images/foo1.png') }}");
+				
+					}
+					
+				}
+				
+				console.log("end of show maps");
+		}
+		
+		function showPlaceList()
+		{
+			if(xhr1.readyState==4 && xhr1.status==200)
+			{
+				var sampleJSON = xhr1.responseText;
+				
+				//var sampleJSON = "{\"location\":{\"latitude\":\"12.835423\",\"locationId\":1,\"locationName\":\"wonderla\",\"longitude\":\"77.400913\",\"places\":[{\"latitude\":\"12.834556\",\"longitude\":\"77.4001127\",\"placeDensity\":{\"density\":10,\"time\":\"12:00\"},\"placeId\":1,\"placeName\":\"dungeonride\",\"placeSize\":100,\"threshold\":50},{\"latitude\":\"12.834556\",\"longitude\":\"77.4001127\",\"placeDensity\":{\"density\":100,\"time\":\"20:00\"},\"placeId\":2,\"placeName\":\"XDMax\",\"placeSize\":200,\"threshold\":100}]}}";
+				var theList = JSON.parse(sampleJSON);
+				//console.log("hhhh")
+				console.log(theList);
+				
+				var listDiv = document.getElementById("listDiv");
+				var listHtml = document.createElement("p");
+				
+				var measureList = [];
+				
+				//Create density measurement array
+				for (var i=0; i<theList.location.places.length; i++)
+				{
+					var ratio = theList.location.places[i].placeDensity.density/theList.location.places[i].threshold;
+					console.log(i+" : "+ratio);
+					measureList[ratio]=i;
+				}
+				//console.log("mmm")
+				console.log(measureList);
+				
+				//Sort density measurement array
+				var sortedOrder = [];
+				console.log("Sorted");
+				for (var i=0; i<measureList.length; i++)
+				{
+					var curr = 2000000;
+					var l = -1;
+					for (var key in measureList)
+					{
+						if (key < curr)
+						{
+							curr = key;
+							l = measureList[key];
+						}
+					}
+					sortedOrder.push(l);
+					delete measureList[curr];
+					console.log(curr+" : "+l+"; "+measureList);
+				}
+				for (var i=sortedOrder.length-1; i>=0; i--)
+				{
+					if (sortedOrder[i]==-1)
+						sortedOrder.splice(i,1);
+				}
+				console.log("sorted order:");
+				console.log(sortedOrder);
+				
+				//Construct sorted places loop
+				sortedPlaces = []
+				for (var i=0; i<sortedOrder.length; i++)
+				{
+					sortedPlaces.push(theList.location.places[sortedOrder[i]]);
+				}
+				console.log("sorted places");
+				console.log(sortedPlaces);
+				
+				//display loop
+				for (var i=0; i<sortedPlaces.length; i++)
+				{
+					li = document.createElement("p");
+					a = document.createElement("a");
+					li.appendChild(a);
+					a.innerHTML = sortedPlaces[i].placeName;
+					a.href = "/place/lid/"+theList.location.locationId+"/pid/"+sortedPlaces[i].placeId;
+					listHtml.appendChild(li);
+				}
+				listDiv.appendChild(listHtml);
+				
+				//VIDYA'S MAP PART
+				Showmaps(sampleJSON);
+			}
+		}
+		
+		function showLocation(id)
+		{
+			
+			xhr1 = new XMLHttpRequest();
+			xhr1.open("GET","/locations/"+id,true);
+			//xhr1.open("GET","test2.php",true);
+			xhr1.onreadystatechange = showPlaceList;
+			xhr1.send(); 
+			
+			//showPlaceList();
+		}
+		
+		params = (new URL(document.location)).searchParams;
+		//locationId = params.get("lid");
+		locationId = {{ locationId }}
+		//alert(locationId);
+		showLocation(locationId);
+		
+		
+	</script>
+	
+</body>
+</html>
